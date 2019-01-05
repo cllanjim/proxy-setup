@@ -1,9 +1,7 @@
 #!/bin/bash
 function detect_os(){
     platform="$(uname -a)"
-
 }
-
 function http_proxy(){
 
 DIR="$(cd "$(dirname "$0")" && pwd)"
