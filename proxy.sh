@@ -12,3 +12,8 @@ else
     printf "%s" "Can not found privoxy server and its configure files,Maybe you have broken installation"
 fi
 }
+function setup_proxy(){
+    sudo systemctl start privoxy.service
+    ss-local ./config.conf
+    ./client_linux_amd64 -c kcp.conf
+}
