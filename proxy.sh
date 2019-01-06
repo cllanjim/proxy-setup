@@ -1,6 +1,7 @@
 #!/bin/bash
 # exit code:
 # exit 3 --  http_proxy fail
+# exit 2 -- get_kcptun
 # exit 1 -- unsupport system
 
 function setup_help(){
@@ -8,7 +9,7 @@ cat <<EOF
 
 Run "setup_help" for get help
 
-Invoke ". ./proxy.sh" from your shell to add the following functions to your environment:
+Invoke "source ./proxy.sh" from your shell to add the following functions to your environment:
 - detect_os :   detect your platform
 - get_kcptun:   get kcptun binary from github release
 - http_proxy:   deploy socks5 and http proxy
@@ -20,6 +21,18 @@ EOF
 }
 
 function detect_os(){
+local help_detect_os(){
+printf "%s" "detect_os -- display system info"
+cat <<EOF
+--help      get help
+--all       get all system info
+--kernel    get kernel name
+--host      get host name # not implement
+--version   get kernel version  # not implement   
+--arch      get machine type # not implement   
+EOF
+}
+local print_kernel(){
 if ([ -f  /usr/bin/uname ] || [ -f /system/bin/uname ]) && \
     ([ -x /usr/bin/uname ] || [ -x /system/bin/uname ]); then
     declare -r platform="$(uname -a)"
@@ -30,18 +43,31 @@ else
     exit 1
 fi
 }
+
+if [ ! -z "$@" ]; then
+    for param in "$@"; do
+        shift
+        case "$param" in
+         "--help")   set -- "$@" "-h"&&help_detect_os;;
+         "--kernel") set -- "$@" "-k"&&print_kernel;;
+        esac
+    done
+fi
+}
 function get_kcptun(){
+
     if [ -f "/tmp/kcptun-linux*" ]; then
         rm "/tmp/kcptun-linux*"
     fi
-    if [[ "$(detect_os)" == "Linux" ]] && [ -f /usr/bin/curl ]; then
+    if [[ "$(detect_os --kernel)" == "Linux" ]] && [ -f /usr/bin/curl ]; then
     declare -r X86_64_URL="https://github.com/xtaci/kcptun/releases/download/v20181114/kcptun-linux-amd64-20181114.tar.gz"
     curl -L "${X86_64_URL}" -o "/tmp/kcptun-linux-amd64-20181114.tar.gz"
-    elif [[ "$(detect_os)" == "Drawin" ]]; then
+    elif [[ "$(detect_os --kernel)" == "Drawin" ]] && [ -f /usr/bin/curl ]; then
     declare -r Drawin_URL="https://github.com/xtaci/kcptun/releases/download/v20181114/kcptun-darwin-amd64-20181114.tar.gz"
     curl -L "${Drawin_URL}" -o "/tmp/kcptun-linux-amd64-20181114.tar.gz"
     else
-        printf "%s" "Sorry, unsupport system"
+        printf "%s" "Only support Linux which install with curl"
+        exit 2
     fi
 }
 function http_proxy(){
