@@ -1,4 +1,23 @@
 #!/bin/bash
+# exit code:
+# exit 3 --  http_proxy fail
+# exit 1 -- unsupport system
+
+function setup_help(){
+cat <<EOF
+
+Run "setup_help" for get help
+
+Invoke ". ./proxy.sh" from your shell to add the following functions to your environment:
+- detect_os :   detect your platform
+- get_kcptun:   get kcptun binary from github release
+- http_proxy:   deploy socks5 and http proxy
+- setup_help:   display help
+Environment options:
+Look at the source to view more functions:
+Github:https://github.com/ihexon/proxy-setup
+EOF
+}
 
 function detect_os(){
 if ([ -f  /usr/bin/uname ] || [ -f /system/bin/uname ]) && \
@@ -8,6 +27,7 @@ if ([ -f  /usr/bin/uname ] || [ -f /system/bin/uname ]) && \
     printf "%s" "${platform_os}"
 else
     printf "%s" "sorry, unsupport system"
+    exit 1
 fi
 }
 function get_kcptun(){
@@ -25,6 +45,10 @@ function get_kcptun(){
     fi
 }
 function http_proxy(){
+if [ ! -f "/tmp/kcptun-linux-*" ]; then
+    printf "%s" "can not find kcptun archive file, please run \`get_kcptun\` again!"
+    exit 3
+fi
 
 declare -r DIR="$(cd "$(dirname "$0")" && pwd)"
 if [ -f $DIR/bin/privoxy  ] && [ -f $DIR/etc/privoxy/config  ] ; then
@@ -38,3 +62,4 @@ function setup_proxy(){
     ss-local ./configs/ss.conf &
     ./client_linux_amd64 -c ./configs/kcp.conf &
 }
+setup_help
