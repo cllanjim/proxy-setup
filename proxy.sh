@@ -56,6 +56,18 @@ fi
 }
 function get_kcptun(){
 
+local help_extract_package(){
+cat <<EOF
+
+
+--help        display help message
+--unpack \$dir      decompress kcptun package to dir
+
+
+EOF
+
+}
+local extract_package(){
     if [ -f "/tmp/kcptun-linux*" ]; then
         rm "/tmp/kcptun-linux*"
     fi
@@ -70,6 +82,18 @@ function get_kcptun(){
         exit 2
     fi
 }
+if [ ! -z '$@' ]; then
+    for param in "$@"; do
+        shift
+        case "$param" in
+         "--help")   set -- "$@" "-h"&&help_extract_package;;
+         "--unpack") set -- "$@" "--unpack $2"&&echo  "$1";;
+        esac
+    done
+fi
+
+}
+
 function http_proxy(){
 if [ ! -f "/tmp/kcptun-linux-*" ]; then
     printf "%s" "can not find kcptun archive file, please run \`get_kcptun\` again!"
