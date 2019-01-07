@@ -1,0 +1,45 @@
+2019/02/04 03:08:55 version: 20181114
+2019/02/04 03:08:55 initiating key derivation
+2019/02/04 03:08:55 listening on: [::]:1081
+2019/02/04 03:08:55 encryption: salsa20
+2019/02/04 03:08:55 nodelay parameters: 1 20 2 1
+2019/02/04 03:08:55 remote address: 65.49.234.246:29900
+2019/02/04 03:08:55 sndwnd: 512 rcvwnd: 512
+2019/02/04 03:08:55 compression: true
+2019/02/04 03:08:55 mtu: 1350
+2019/02/04 03:08:55 datashard: 10 parityshard: 3
+2019/02/04 03:08:55 acknodelay: false
+2019/02/04 03:08:55 dscp: 0
+2019/02/04 03:08:55 sockbuf: 4194304
+2019/02/04 03:08:55 keepalive: 10
+2019/02/04 03:08:55 conn: 1
+2019/02/04 03:08:55 autoexpire: 0
+2019/02/04 03:08:55 scavengettl: 600
+2019/02/04 03:08:55 snmplog: 
+2019/02/04 03:08:55 snmpperiod: 60
+2019/02/04 03:08:55 quiet: false
+2019/02/04 03:08:55 connection: 192.168.1.10:39049 -> 65.49.234.246:29900
+2019/02/04 03:08:58 stream opened
+2019/02/04 03:08:59 stream opened
+2019/02/04 03:09:00 stream opened
+2019/02/04 03:09:00 stream opened
+2019/02/04 03:09:00 stream opened
+2019/02/04 03:09:00 stream opened
+2019/02/04 03:09:00 stream opened
+2019/02/04 03:09:02 stream opened
+2019/02/04 03:09:21 stream opened
+2019/02/04 03:09:22 stream closed
+2019/02/04 03:09:25 stream opened
+2019/02/04 03:09:26 stream closed
+2019/02/04 03:09:36 stream opened
+2019/02/04 03:09:37 stream closed
+2019/02/04 03:09:51 stream opened
+2019/02/04 03:09:53 stream closed
+2019/02/04 03:10:00 stream opened
+2019/02/04 03:10:01 stream closed
+2019/02/04 03:10:01 stream closed
+2019/02/04 03:10:01 stream closed
+2019/02/04 03:10:19 stream opened
+2019/02/04 03:10:20 stream closed
+2019/02/04 03:10:21 stream opened
+2019/02/04 03:10:23 stream closed
