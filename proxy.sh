@@ -67,8 +67,11 @@ local detect_downloader(){
         printf "%s" "wget"
     elif [ -f /usr/bin/axel ]; then
         printf "%s" "axel"
+    elif [ -f /usr/bin/aria2c ];then
+        printf "%s" "aria2c"
     else
         printf "%s" "can not find any downloader,please install wget curl or axel"
+        return
     fi
 }
 local help_extract_package(){
@@ -77,7 +80,6 @@ cat <<EOF
 
 --help        display help message
 --unpack \$dir      decompress kcptun package to dir
-
 
 EOF
 
@@ -88,10 +90,21 @@ local extract_package(){
     fi
     if [[ "$(detect_os --kernel)" == "Linux" ]] && [ -f /usr/bin/curl ]; then
     declare -r X86_64_URL="https://github.com/xtaci/kcptun/releases/download/v20181114/kcptun-linux-amd64-20181114.tar.gz"
-    curl -L "${X86_64_URL}" -o "/tmp/kcptun-linux-amd64-20181114.tar.gz"
+    if ( $(detect_downloader) -L "${X86_64_URL}" -o "/tmp/kcptun-linux-amd64-20181114.tar.gz" );then
+        printf "%s" "kcptun archive file store at /tmp/kcptun-linux-amd64-20181114.tar.gz\nExtract /tmp/kcptun-linux-amd64-20181114.tar.gz into /tmp\n"
+        if (tar -xvf /tmp/kcptun-linux-amd64-20181114.tar.gz -C /tmp);then
+            printf "%s" "extract kcptun-linux-amd64-20181114.tar.gz successful\n"
+        else
+            printf "%s" "extract kcptun-linux-amd64-20181114.tar.gz fail, please try again."
+            return
+        fi
+    else
+        printf "%s" "download kcptun package fail, please try again!"
+    fi
+
     elif [[ "$(detect_os --kernel)" == "Drawin" ]] && [ -f /usr/bin/curl ]; then
     declare -r Drawin_URL="https://github.com/xtaci/kcptun/releases/download/v20181114/kcptun-darwin-amd64-20181114.tar.gz"
-    curl -L "${Drawin_URL}" -o "/tmp/kcptun-linux-amd64-20181114.tar.gz"
+    $(detect_downloader) -L "${Drawin_URL}" -o "/tmp/kcptun-linux-amd64-20181114.tar.gz"
     else
         printf "%s" "Only support Linux which install with curl"
         return
@@ -102,7 +115,7 @@ if [ ! -z '$@' ]; then
         shift
         case "$param" in
          "--help")    set -- "$@" "-h"&&help_extract_package;;
-         "--unpack")  set -- "$@" "--unpack $1"&&echo  "$1"&&return;;
+         "--unpack")  set -- "$@" "--unpack $1"&&extract_package&&return;;
          *)           set -- "$@" "'unknow options'"&&printf  "unrecognized option\n";;
         esac
     done
