@@ -17,6 +17,8 @@ Invoke "source ./proxy.sh" from your shell to add the following functions to you
 Environment options:
 Look at the source to view more functions:
 Github:https://github.com/ihexon/proxy-setup
+
+
 EOF
 }
 
@@ -24,12 +26,14 @@ function detect_os(){
 local help_detect_os(){
 printf "%s" "detect_os -- display system info"
 cat <<EOF
+
 --help      get help
 --all       get all system info
 --kernel    get kernel name
 --host      get host name # not implement
 --version   get kernel version  # not implement   
 --arch      get machine type # not implement   
+
 EOF
 }
 local print_kernel(){
@@ -50,12 +54,23 @@ if [ ! -z "$@" ]; then
         case "$param" in
          "--help")   set -- "$@" "-h"&&help_detect_os;;
          "--kernel") set -- "$@" "-k"&&print_kernel;;
+         *)          set -- "$@" "'unknow options'"&&printf  "unrecognized option\n";;
         esac
     done
 fi
 }
 function get_kcptun(){
-
+local detect_downloader(){
+    if [ -f /usr/bin/curl ];then
+        printf "%s" "curl"
+    elif [ -f /usr/bin/wget ];then
+        printf "%s" "wget"
+    elif [ -f /usr/bin/axel ]; then
+        printf "%s" "axel"
+    else
+        printf "%s" "can not find any downloader,please install wget curl or axel"
+    fi
+}
 local help_extract_package(){
 cat <<EOF
 
@@ -79,19 +94,19 @@ local extract_package(){
     curl -L "${Drawin_URL}" -o "/tmp/kcptun-linux-amd64-20181114.tar.gz"
     else
         printf "%s" "Only support Linux which install with curl"
-        exit 2
+        return
     fi
 }
 if [ ! -z '$@' ]; then
     for param in "$@"; do
         shift
         case "$param" in
-         "--help")   set -- "$@" "-h"&&help_extract_package;;
-         "--unpack") set -- "$@" "--unpack $2"&&echo  "$1";;
+         "--help")    set -- "$@" "-h"&&help_extract_package;;
+         "--unpack")  set -- "$@" "--unpack $1"&&echo  "$1"&&return;;
+         *)           set -- "$@" "'unknow options'"&&printf  "unrecognized option\n";;
         esac
     done
 fi
-
 }
 
 function http_proxy(){
