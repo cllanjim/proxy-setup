@@ -44,7 +44,7 @@ if ([ -f  /usr/bin/uname ] || [ -f /system/bin/uname ]) && \
     printf "%s" "${platform_os}"
 else
     printf "%s" "sorry, unsupport system"
-    exit 1
+    return 1
 fi
 }
 
@@ -114,8 +114,8 @@ if [ ! -z '$@' ]; then
     for param in "$@"; do
         shift
         case "$param" in
-         "--help")    set -- "$@" "-h"&&help_extract_package;;
-         "--unpack")  set -- "$@" "--unpack $1"&&extract_package&&return;;
+         "--help")    set -- "$@" "-h"&&help_extract_package&&return||return;;
+         "--unpack")  set -- "$@" "--unpack $1"&&extract_package&&return||return;;
          *)           set -- "$@" "'unknow options'"&&printf  "unrecognized option\n";;
         esac
     done
@@ -123,13 +123,15 @@ fi
 }
 
 function http_proxy(){
-if [ ! -f "/tmp/kcptun-linux-*" ]; then
-    printf "%s" "can not find kcptun archive file, please run \`get_kcptun\` again!"
-    exit 3
+declare -r DIR="$(cd "$(dirname "$0")" && pwd)"
+if [ ! -f "/tmp/client_linux_amd64" ]; then
+    printf "%s" "can not find kcptun client, please run \`get_kcptun\` again!"
+    return 3;
+else
+    cp "/tmp/client_linux_amd64" ""${DIR}"/x86_64"
 fi
 
-declare -r DIR="$(cd "$(dirname "$0")" && pwd)"
-if [ -f $DIR/bin/privoxy  ] && [ -f $DIR/etc/privoxy/config  ] ; then
+if [ -f $DIR/x86_64/privoxy  ] && [ -f $DIR/x86_64/etc/privoxy/config  ] ; then
     printf "exec %s" "$DIR/bin/privoxy -c $DIR/etc/privoxy/config"
 else
     printf "%s" "Can not found privoxy server and its configure files,Maybe you have broken installation"
