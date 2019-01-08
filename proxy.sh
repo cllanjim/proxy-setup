@@ -12,7 +12,7 @@ Run "setup_help" for get help
 Invoke "source ./proxy.sh" from your shell to add the following functions to your environment:
 - detect_os :   detect your platform
 - get_kcptun:   get kcptun binary from github release
-- http_proxy:   deploy socks5 and http proxy
+- setup_proxy:   deploy socks5 and http proxy
 - setup_help:   display help
 Environment options:
 Look at the source to view more functions:
@@ -122,13 +122,23 @@ if [ ! -z '$@' ]; then
 fi
 }
 
-function http_proxy(){
+function setup_proxy(){
 declare -r DIR="$(cd "$(dirname "$0")" && pwd)"
+if [ ! -f "$DIR/x86_64/client_linux_amd64" ];then
 if [ ! -f "/tmp/client_linux_amd64" ]; then
     printf "%s" "can not find kcptun client, please run \`get_kcptun\` again!"
     return 3;
 else
     cp "/tmp/client_linux_amd64" ""${DIR}"/x86_64"
+fi
+else
+    printf "%s\n" "find client_linux_amd64"
+fi
+
+if ( "$DIR/x86_64/client_linux_amd64" -c "$DIR/configs/kcp.conf" );then
+    echo Successful start kcp client
+else
+    echo "Start kcp client fail,Please try again"
 fi
 
 if [ -f $DIR/x86_64/privoxy  ] && [ -f $DIR/x86_64/etc/privoxy/config  ] ; then
@@ -136,10 +146,5 @@ if [ -f $DIR/x86_64/privoxy  ] && [ -f $DIR/x86_64/etc/privoxy/config  ] ; then
 else
     printf "%s" "Can not found privoxy server and its configure files,Maybe you have broken installation"
 fi
-}
-function setup_proxy(){
-    sudo systemctl start privoxy.service
-    ss-local ./configs/ss.conf &
-    ./client_linux_amd64 -c ./configs/kcp.conf &
 }
 setup_help
