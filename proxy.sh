@@ -23,7 +23,7 @@ EOF
 }
 
 function detect_os(){
-local help_detect_os(){
+help_detect_os(){
 printf "%s" "detect_os -- display system info"
 cat <<EOF
 
@@ -36,7 +36,7 @@ cat <<EOF
 
 EOF
 }
-local print_kernel(){
+print_kernel(){
 if ([ -f  /usr/bin/uname ] || [ -f /system/bin/uname ]) && \
     ([ -x /usr/bin/uname ] || [ -x /system/bin/uname ]); then
     declare -r platform="$(uname -a)"
@@ -60,7 +60,7 @@ if [ ! -z "$@" ]; then
 fi
 }
 function get_kcptun(){
-local detect_downloader(){
+detect_downloader(){
     if [ -f /usr/bin/curl ];then
         printf "%s" "curl"
     elif [ -f /usr/bin/wget ];then
@@ -74,7 +74,7 @@ local detect_downloader(){
         return
     fi
 }
-local help_extract_package(){
+help_extract_package(){
 cat <<EOF
 
 
@@ -84,7 +84,7 @@ cat <<EOF
 EOF
 
 }
-local extract_package(){
+extract_package(){
     if [ -f "/tmp/kcptun-linux*" ]; then
         rm "/tmp/kcptun-linux*"
     fi
