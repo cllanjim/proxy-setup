@@ -2,6 +2,14 @@
 Auto deploy a proxy(HTTP and Socks5) proxy
 
 
+# Delpoy using script
+
+Source the script:
+`source ./proxy.sh`
+
+once the function add into your enviroment,you can using the function install launch the kcp,shadowsocks,and privoxy 
+eaily
+
 
 # Deploy
 Install privoxy.

@@ -48,12 +48,19 @@ else
 fi
 }
 
+# Print architecture
+__print_arch(){
+    declare -r platform_arch=$(uname -m)
+    printf "%s" "${platform_arch}"
+}
+
 if [ ! -z "$@" ]; then
     for param in "$@"; do
         shift
         case "$param" in
          "--help")   set -- "$@" "-h"&&help_detect_os;;
          "--kernel") set -- "$@" "-k"&&print_kernel;;
+         "--arch")   set -- "$@" "-arch"&&__print_arch;;
          *)          set -- "$@" "'unknow options'"&&printf  "unrecognized option\n";;
         esac
     done
@@ -85,30 +92,39 @@ EOF
 
 }
 extract_package(){
-    if [ -f "/tmp/kcptun-linux*" ]; then
+if [ -f "/tmp/kcptun-linux*" ]; then
         rm "/tmp/kcptun-linux*"
-    fi
+fi
+declare -i using_local_kcp=1
+if [ "${using_local_kcp}" -eq 0 ];then
+
     if [[ "$(detect_os --kernel)" == "Linux" ]] && [ -f /usr/bin/curl ]; then
     declare -r X86_64_URL="https://github.com/xtaci/kcptun/releases/download/v20181114/kcptun-linux-amd64-20181114.tar.gz"
-    if ( $(detect_downloader) -L "${X86_64_URL}" -o "/tmp/kcptun-linux-amd64-20181114.tar.gz" );then
+        if ( $(detect_downloader) -L "${X86_64_URL}" -o "/tmp/kcptun-linux-amd64-20181114.tar.gz" );then
         printf "%s" "kcptun archive file store at /tmp/kcptun-linux-amd64-20181114.tar.gz\nExtract /tmp/kcptun-linux-amd64-20181114.tar.gz into /tmp\n"
-        if (tar -xvf /tmp/kcptun-linux-amd64-20181114.tar.gz -C /tmp);then
-            printf "%s" "extract kcptun-linux-amd64-20181114.tar.gz successful\n"
+            if (tar -xvf /tmp/kcptun-linux-amd64-20181114.tar.gz -C /tmp);then
+                printf "%s\n" "extract kcptun-linux-amd64-20181114.tar.gz successful"
+            else
+                printf "%s\n" "extract kcptun-linux-amd64-20181114.tar.gz fail, please try again."
+                return
+            fi
         else
-            printf "%s" "extract kcptun-linux-amd64-20181114.tar.gz fail, please try again."
-            return
+            printf "%s" "download kcptun package fail, please try again!"
         fi
-    else
-        printf "%s" "download kcptun package fail, please try again!"
-    fi
 
     elif [[ "$(detect_os --kernel)" == "Drawin" ]] && [ -f /usr/bin/curl ]; then
-    declare -r Drawin_URL="https://github.com/xtaci/kcptun/releases/download/v20181114/kcptun-darwin-amd64-20181114.tar.gz"
-    $(detect_downloader) -L "${Drawin_URL}" -o "/tmp/kcptun-linux-amd64-20181114.tar.gz"
+            declare -r Drawin_URL="https://github.com/xtaci/kcptun/releases/download/v20181114/kcptun-darwin-amd64-20181114.tar.gz"
+            $(detect_downloader) -L "${Drawin_URL}" -o "/tmp/kcptun-linux-amd64-20181114.tar.gz"
     else
-        printf "%s" "Only support Linux which install with curl"
-        return
+            printf "%s" "Only support Linux which install with curl"
+            return
     fi
+else
+    # Using local package in prebuild/kcptun-linux-*.tar.xz
+    if [ "$(detect_os --kernel)" == "Linux" ]; then
+    printf "%s" "Using local package in prebuild/kcptun-linux-amd64-20181114.tar.gz"
+    fi
+fi
 }
 if [ ! -z '$@' ]; then
     for param in "$@"; do
@@ -141,10 +157,14 @@ else
     echo "Start kcp client fail,Please try again"
 fi
 
+
+
+
 if [ -f $DIR/x86_64/privoxy  ] && [ -f $DIR/x86_64/etc/privoxy/config  ] ; then
     printf "exec %s" "$DIR/bin/privoxy -c $DIR/etc/privoxy/config"
 else
     printf "%s" "Can not found privoxy server and its configure files,Maybe you have broken installation"
 fi
+
 }
 setup_help
