@@ -28,11 +28,11 @@ printf "%s" "detect_os -- display system info"
 cat <<EOF
 
 --help      get help
---all       get all system info
+--all       get all system info # not implement yet
 --kernel    get kernel name
 --host      get host name # not implement
---version   get kernel version  # not implement   
---arch      get machine type # not implement   
+--version   get kernel version  # not implement yet
+--arch      get machine type # not implement yet
 
 EOF
 }
@@ -84,7 +84,6 @@ detect_downloader(){
 help_extract_package(){
 cat <<EOF
 
-
 --help        display help message
 --unpack \$dir      decompress kcptun package to dir
 
@@ -95,13 +94,14 @@ extract_package(){
 if [ -f "/tmp/kcptun-linux*" ]; then
         rm "/tmp/kcptun-linux*"
 fi
-declare -i using_local_kcp=1
+declare -i using_local_kcp=1 # if using internet to download package or using local package
 if [ "${using_local_kcp}" -eq 0 ];then
-
-    if [[ "$(detect_os --kernel)" == "Linux" ]] && [ -f /usr/bin/curl ]; then
-    declare -r X86_64_URL="https://github.com/xtaci/kcptun/releases/download/v20181114/kcptun-linux-amd64-20181114.tar.gz"
-        if ( $(detect_downloader) -L "${X86_64_URL}" -o "/tmp/kcptun-linux-amd64-20181114.tar.gz" );then
-        printf "%s" "kcptun archive file store at /tmp/kcptun-linux-amd64-20181114.tar.gz\nExtract /tmp/kcptun-linux-amd64-20181114.tar.gz into /tmp\n"
+    # x86_64 architecture logic 
+    if [[ "$(detect_os --kernel)" == "Linux" ]] && [[ "$(detect_os --arch)" == "x86_64" ]]; then
+        declare -r download_url="https://github.com/xtaci/kcptun/releases/download/v20181114/kcptun-linux-amd64-20181114.tar.gz"
+        if ( $(detect_downloader) -L "${download_url}" -o "/tmp/kcptun-linux-amd64-20181114.tar.gz" );then
+             printf "%s\n%s\n"   "kcptun archive file store at /tmp/kcptun-linux-amd64-20181114.tar.gz" \ 
+                            "Extract /tmp/kcptun-linux-amd64-20181114.tar.gz into /tmp"
             if (tar -xvf /tmp/kcptun-linux-amd64-20181114.tar.gz -C /tmp);then
                 printf "%s\n" "extract kcptun-linux-amd64-20181114.tar.gz successful"
             else
@@ -110,13 +110,34 @@ if [ "${using_local_kcp}" -eq 0 ];then
             fi
         else
             printf "%s" "download kcptun package fail, please try again!"
+            return
+        fi
+    # The logic ARM architecture
+    elif [[ "$(detect_os --kernel)" == ""Linux ]] && [[ "$(detect_os --arch)" == "armv8l" ]]; then
+        declare -r download_url="https://github.com/xtaci/kcptun/releases/download/v20181114/kcptun-linux-arm-20181114.tar.gz"
+        if  ($(detect_downloader) -L "${download_url}" -o "/tmp/kcptun-linux-arm-20181114.tar.gz");then
+             printf "%s\n%s\n"   "kcptun archive file store at /tmp/kcptun-linux-arm-20181114.tar.gz" \ 
+                            "Extract /tmp/kcptun-linux-arm-20181114.tar.gz into /tmp"
+            if (tar -xvf /tmp/kcptun-linux-arm-20181114.tar.gz -C /tmp);then
+                printf "%s\n" "extract kcptun-linux-amd64-20181114.tar.gz successful"
+            else
+                printf "%s\n" "extract kcptun-linux-amd64-20181114.tar.gz fail, please try again."
+                return
+            fi
+        else
+            printf "%s" "download kcptun package fail, please try again!"
+            return
         fi
 
-    elif [[ "$(detect_os --kernel)" == "Drawin" ]] && [ -f /usr/bin/curl ]; then
-            declare -r Drawin_URL="https://github.com/xtaci/kcptun/releases/download/v20181114/kcptun-darwin-amd64-20181114.tar.gz"
-            $(detect_downloader) -L "${Drawin_URL}" -o "/tmp/kcptun-linux-amd64-20181114.tar.gz"
+    
+    # I dont have MacOs.If I have chance test on MacOS,I will finish this pices of code
+    ####################################################################################
+    elif [[ "$(detect_os --kernel)" == "Drawin" ]]; then
+        declare -r download_url="https://github.com/xtaci/kcptun/releases/download/v20181114/kcptun-darwin-amd64-20181114.tar.gz"
+        $(detect_downloader) -L "${download_url}" -o "/tmp/kcptun-linux-amd64-20181114.tar.gz"
+    ####################################################################################
     else
-            printf "%s" "Only support Linux which install with curl"
+        printf "%s" "Only support Linux(architecture X86_64,ARM,AARCH) which install with curl"
             return
     fi
 else
@@ -132,7 +153,7 @@ if [ ! -z '$@' ]; then
         case "$param" in
          "--help")    set -- "$@" "-h"&&help_extract_package&&return||return;;
          "--unpack")  set -- "$@" "--unpack $1"&&extract_package&&return||return;;
-         *)           set -- "$@" "'unknow options'"&&printf  "unrecognized option\n";;
+         *)           set -- "$@" "'unknow options'"&&printf  "unrecognized option\n"&&return||return;;
         esac
     done
 fi
@@ -140,16 +161,19 @@ fi
 
 function setup_proxy(){
 declare -r DIR="$(cd "$(dirname "$0")" && pwd)"
-if [ ! -f "$DIR/x86_64/client_linux_amd64" ];then
-if [ ! -f "/tmp/client_linux_amd64" ]; then
-    printf "%s" "can not find kcptun client, please run \`get_kcptun\` again!"
-    return 3;
-else
-    cp "/tmp/client_linux_amd64" ""${DIR}"/x86_64"
-fi
+
+if [ "$(detect_os --kernel)" == "Linux" ] && [ "$(detect_os --arch)" == "x86_64" ] && [ ! -f "$DIR/x86_64/client_linux_amd64" ];then
+    if [ ! -f "/tmp/client_linux_amd64" ]; then
+        printf "%s" "can not find kcptun client, please run \`get_kcptun\` again!"
+        return 3;
+    else
+        cp "/tmp/client_linux_amd64" ""${DIR}"/x86_64"
+    fi
 else
     printf "%s\n" "find client_linux_amd64"
 fi
+
+
 
 if ( "$DIR/x86_64/client_linux_amd64" -c "$DIR/configs/kcp.conf" );then
     echo Successful start kcp client
