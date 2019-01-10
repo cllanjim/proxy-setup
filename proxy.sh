@@ -94,7 +94,9 @@ extract_package(){
 if [ -f "/tmp/kcptun-linux*" ]; then
         rm "/tmp/kcptun-linux*"
 fi
+
 declare -i using_local_kcp=1 # if using internet to download package or using local package
+
 if [ "${using_local_kcp}" -eq 0 ];then
     # x86_64 architecture logic 
     if [[ "$(detect_os --kernel)" == "Linux" ]] && [[ "$(detect_os --arch)" == "x86_64" ]]; then
@@ -119,9 +121,9 @@ if [ "${using_local_kcp}" -eq 0 ];then
              printf "%s\n%s\n"   "kcptun archive file store at /tmp/kcptun-linux-arm-20181114.tar.gz" \ 
                             "Extract /tmp/kcptun-linux-arm-20181114.tar.gz into /tmp"
             if (tar -xvf /tmp/kcptun-linux-arm-20181114.tar.gz -C /tmp);then
-                printf "%s\n" "extract kcptun-linux-amd64-20181114.tar.gz successful"
+                printf "%s\n" "extract kcptun-linux-arm-20181114.tar.gz successful"
             else
-                printf "%s\n" "extract kcptun-linux-amd64-20181114.tar.gz fail, please try again."
+                printf "%s\n" "extract kcptun-linux-arm-20181114.tar.gz fail, please try again."
                 return
             fi
         else
@@ -137,16 +139,43 @@ if [ "${using_local_kcp}" -eq 0 ];then
         $(detect_downloader) -L "${download_url}" -o "/tmp/kcptun-linux-amd64-20181114.tar.gz"
     ####################################################################################
     else
-        printf "%s" "Only support Linux(architecture X86_64,ARM,AARCH) which install with curl"
+        printf "%s" "Internet install Only support Linux(architecture X86_64,ARM,AARCH) which install with curl"
             return
     fi
 else
     # Using local package in prebuild/kcptun-linux-*.tar.xz
-    if [ "$(detect_os --kernel)" == "Linux" ]; then
-    printf "%s" "Using local package in prebuild/kcptun-linux-amd64-20181114.tar.gz"
+
+    # x86_64 logical
+    if [[ "$(detect_os --kernel)" == "Linux" ]] && [[ $(detect_os --arch) == "x86_64" ]]; then
+    printf "%s\n%s\n" "X64 Architecture" "Using local package in prebuild/kcptun-linux-amd64-20181114.tar.gz"
+        if [ -f prebuild/kcptun-linux-amd64-20181114.tar.gz ];then
+            printf "%s\n" "extract kcptun package now...."
+            if (tar -xvf prebuild/kcptun-linux-amd64-20181114.tar.gz -C x86_64);then
+                printf "%s\n" "extract kcptun package Successful"
+            else
+                printf "%s\n" "extract package faile,the script must work inside project dir, or mybe you have broken installation"
+            fi
+        fi
     fi
+
+
+    if [[ "$(detect_os --kernel)" == "Linux" ]] && [[ $(detect_os --arch) == "aarch64" ]] || [[ $(detect_os --arch) == "^arm" ]] ; then
+    printf "%s\n%s\n"  "ARM Architecture" "Using local package in prebuild/kcptun-linux-arm-20181114.tar.gz"
+        if [ -f prebuild/kcptun-linux-arm-20181114.tar.gz ];then
+            printf "%s\n" "extract kcptun package now...."
+            if (tar -xvf prebuild/kcptun-linux-arm-20181114.tar.gz -C arm);then
+                printf "%s\n" "extract kcptun package Successful"
+            else
+                printf "%s\n" "extract package faile,the script must work inside project dir, mybe you have broken installation"
+            fi
+        fi
+    fi
+
+
 fi
+
 }
+
 if [ ! -z '$@' ]; then
     for param in "$@"; do
         shift
