@@ -3,7 +3,7 @@
 # exit 3 --  http_proxy fail
 # exit 2 -- get_kcptun
 # exit 1 -- unsupport system
-
+# I don want write this f**k code anymore,s**it !
 function setup_help(){
 cat <<EOF
 
@@ -159,16 +159,27 @@ else
     fi
 
 
-    if [[ "$(detect_os --kernel)" == "Linux" ]] && [[ $(detect_os --arch) == "aarch64" ]] || [[ $(detect_os --arch) == "^arm" ]] ; then
-    printf "%s\n%s\n"  "ARM Architecture" "Using local package in prebuild/kcptun-linux-arm-20181114.tar.gz"
+    if [[ "$(detect_os --kernel)" == "Linux" ]] && [[ $(detect_os --arch) == "aarch64" ]] || [[ $(detect_os --arch) == "arm*" ]] ; then
         if [ -f prebuild/kcptun-linux-arm-20181114.tar.gz ];then
+            printf "%s\n%s\n"  "ARM Architecture" "Using local package in prebuild/kcptun-linux-arm-20181114.tar.gz"
             printf "%s\n" "extract kcptun package now...."
             if (tar -xvf prebuild/kcptun-linux-arm-20181114.tar.gz -C arm);then
                 printf "%s\n" "extract kcptun package Successful"
             else
                 printf "%s\n" "extract package faile,the script must work inside project dir, mybe you have broken installation"
+                return
             fi
         fi
+
+        
+        if [[ -d /data/local/tmp ]];then
+            printf "%s\n" "ARM Architecture,platform is Android"
+        else
+            # do something
+        fi
+
+    else
+        print "%s\n%s\n" "unkonw platform" "not support this system yet"
     fi
 
 
