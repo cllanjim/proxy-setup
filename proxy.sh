@@ -155,6 +155,9 @@ else
             else
                 printf "%s\n" "extract package faile,the script must work inside project dir, or mybe you have broken installation"
             fi
+        else
+            printf "%s" "prebuild/kcptun-linux-amd64-20181114.tar.gz do not exit,please using internet install"
+            return
         fi
     fi
 

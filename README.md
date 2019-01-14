@@ -2,10 +2,11 @@
 Auto deploy a proxy(HTTP and Socks5) proxy
 
 
+**STATUS: NOT FINISH  YET**
+
 # Delpoy using script
 
 
-STATUS: NOT FINISH  YET
 
 Source the script:
 `source ./proxy.sh`
