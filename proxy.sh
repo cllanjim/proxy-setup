@@ -176,6 +176,7 @@ else
             printf "%s\n" "ARM Architecture,platform is Android"
         else
             # do something
+            # do nothing ,compiled as static binary
         fi
 
     else
@@ -197,6 +198,20 @@ if [ ! -z '$@' ]; then
         esac
     done
 fi
+}
+
+function setup_shadowsocks(){
+
+    # X86_64 Setup shadowsocks
+if [ "$(detect_os --kernel)" == "Linux" ] && [ "$(detect_os --arch)" == "x86_64" ] && [ ! -f "$DIR/x86_64/client_linux_amd64" ];then
+    if [ -f ./x86_64/bin/bin/ss-local ]; then
+        (LD_LIBRARY_PATH=./x86_64/bin/lib:$LD_LIBRARY_PATH ./x86_64/bin/bin/ss-local -c ./US2.cong &>log/ss.log) &
+        printf "%s\n" "message log to log/ss.log"
+    fi
+fi
+
+
+
 }
 
 function setup_proxy(){
