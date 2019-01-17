@@ -223,10 +223,14 @@ ___setup_shadowsocks_wgJui9NzMMzLM8pbFMnlIaSSUHbsbLVY(){
 # X86_64 Setup shadowsocks
 if [[ "$(detect_os --kernel)" == "Linux" ]] && [[ "$(detect_os --arch)" == "x86_64" ]];then
     if [ -f x86_64/shadowsocks-libev_glibc_x86-64/bin/ss-local ]; then
-        (LD_LIBRARY_PATH=x86_64/shadowsocks-libev_glibc_x86-64/lib:$LD_LIBRARY_PATH ./x86_64/shadowsocks-libev_glibc_x86-64/bin/ss-local -c ./US2.conf &>log/ss.log &)
-        printf "%s\n" "message log to log/ss.log"
+        if (LD_LIBRARY_PATH=x86_64/shadowsocks-libev_glibc_x86-64/lib:$LD_LIBRARY_PATH ./x86_64/shadowsocks-libev_glibc_x86-64/bin/ss-local -c ./US2.conf &>log/ss.log &);then
+            printf "%s\n" "Staring shadowsocks"
+            printf "%s\n" "message log to log/ss.log"
+        else
+            printf "%s\n" "Start shadowsocks failed"
+        fi
     else
-        printf "%s" "setup shadowsocks failed"
+        printf "%s" "can not found shadowsocks"
     fi
 else
     if [[ "$(detect_os --kernel)" == "Linux" ]] && \
@@ -251,6 +255,10 @@ if [ "$(detect_os --kernel)" == "Linux" ] && [ "$(detect_os --arch)" == "x86_64"
 else
     printf "%s\n" "find client_linux_amd64"
 fi
+
+# TODO: Linux Standard Base PDA Specification 3.0RC1--System Initialization
+# See:http://refspecs.linuxbase.org/LSB_3.0.0/LSB-PDA/LSB-PDA/iniscrptfunc.html
+# implement some function to start ,stop,restart daemon
 
 
 
