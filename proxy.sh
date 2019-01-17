@@ -203,23 +203,44 @@ if [ ! -z '$@' ]; then
 fi
 }
 
-function setup_shadowsocks(){
-
-    # X86_64 Setup shadowsocks
-if [ "$(detect_os --kernel)" == "Linux" ] && [ "$(detect_os --arch)" == "x86_64" ] && [ ! -f "$DIR/x86_64/client_linux_amd64" ];then
-    if [ -f ./x86_64/bin/bin/ss-local ]; then
-        (LD_LIBRARY_PATH=./x86_64/bin/lib:$LD_LIBRARY_PATH ./x86_64/bin/bin/ss-local -c ./US2.cong &>log/ss.log) &
-        printf "%s\n" "message log to log/ss.log"
-    fi
-fi
-
-
-
-}
-
 function setup_proxy(){
+
 declare -r DIR="$(cd "$(dirname "$0")" && pwd)"
 
+___setup_proxyhelp_GDiRd1VBggVJhYR7qt9gJlCU0URyy6vO(){
+    
+cat <<EOF
+
+--setup-ss :   setup shadowsocks proxy
+--setup-kcp:   setup kcptun proxy
+Look at the source to view more functions:
+Github:https://github.com/ihexon/proxy-setup
+
+EOF
+}
+
+___setup_shadowsocks_wgJui9NzMMzLM8pbFMnlIaSSUHbsbLVY(){
+# X86_64 Setup shadowsocks
+if [[ "$(detect_os --kernel)" == "Linux" ]] && [[ "$(detect_os --arch)" == "x86_64" ]];then
+    if [ -f x86_64/shadowsocks-libev_glibc_x86-64/bin/ss-local ]; then
+        (LD_LIBRARY_PATH=x86_64/shadowsocks-libev_glibc_x86-64/lib:$LD_LIBRARY_PATH ./x86_64/shadowsocks-libev_glibc_x86-64/bin/ss-local -c ./US2.conf &>log/ss.log &)
+        printf "%s\n" "message log to log/ss.log"
+    else
+        printf "%s" "setup shadowsocks failed"
+    fi
+else
+    if [[ "$(detect_os --kernel)" == "Linux" ]] && \
+        [[ ("$(detect_os --arch)" == "aarch") ]] || [[ "$(detect_os --arch)" == "arm*" ]];then
+        (LD_LIBRARY_PATH=./arm/bin/lib:$LD_LIBRARY_PATH ./arm/bin/bin/ss-local -c ./US2.cong &>log/ss.log) &
+        printf "%s\n" "message log to log/ss.log"
+    else
+        printf "%s\n" "setup shadowsocks failed"
+    fi
+
+fi
+}
+
+___setup_kcptun_ZNIXZqrwykvJ3kahmYQMfFRoehKCgM2O(){
 if [ "$(detect_os --kernel)" == "Linux" ] && [ "$(detect_os --arch)" == "x86_64" ] && [ ! -f "$DIR/x86_64/client_linux_amd64" ];then
     if [ ! -f "/tmp/client_linux_amd64" ]; then
         printf "%s" "can not find kcptun client, please run \`get_kcptun\` again!"
@@ -239,14 +260,30 @@ else
     echo "Start kcp client fail,Please try again"
 fi
 
+}
 
-
-
-if [ -f $DIR/x86_64/privoxy  ] && [ -f $DIR/x86_64/etc/privoxy/config  ] ; then
-    printf "exec %s" "$DIR/bin/privoxy -c $DIR/etc/privoxy/config"
-else
-    printf "%s" "Can not found privoxy server and its configure files,Maybe you have broken installation"
+if [ -z "$@" ];then
+    ___setup_proxyhelp_GDiRd1VBggVJhYR7qt9gJlCU0URyy6vO
 fi
+if [ ! -z "$@" ];then
+    for param in "$@"; do
+        shift
+        case "$param" in
+            "--setup-ss") set -- "$@" "-ss"&&___setup_shadowsocks_wgJui9NzMMzLM8pbFMnlIaSSUHbsbLVY;;
+        esac
+    done
+
+fi
+
+
+
+
+
+#if [ -f $DIR/x86_64/privoxy  ] && [ -f $DIR/x86_64/etc/privoxy/config  ] ; then
+#    printf "exec %s" "$DIR/bin/privoxy -c $DIR/etc/privoxy/config"
+#else
+#    printf "%s" "Can not found privoxy server and its configure files,Maybe you have broken installation"
+#fi
 
 }
 setup_help
