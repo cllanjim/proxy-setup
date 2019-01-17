@@ -1,9 +1,12 @@
 #!/bin/bash
-# exit code:
-# exit 3 --  http_proxy fail
-# exit 2 -- get_kcptun
-# exit 1 -- unsupport system
-# I don want write this f**k code anymore,s**it !
+
+# How it is Works??
+# shadowsocks client <---> kcptun server <----------> kcptun server <--------------> shadowsocks server
+
+# source ./proxy.sh
+# Using this way to lunch all things togeter
+# setup_proxy get_kcptun get_shadowsocks  kcptun_client shadowsocks_client privoxy
+
 function setup_help(){
 cat <<EOF
 
@@ -201,6 +204,11 @@ if [ ! -z '$@' ]; then
         esac
     done
 fi
+}
+
+
+function get_shadowsocks(){
+    # TODO: get_shadowsocks function
 }
 
 function setup_proxy(){
