@@ -221,6 +221,8 @@ cat <<EOF
 
 --setup-ss :   setup shadowsocks proxy
 --setup-kcp:   setup kcptun proxy
+--setup-privoxy setup http proxy
+--kill-all:    kill ss and kcptun client
 Look at the source to view more functions:
 Github:https://github.com/ihexon/proxy-setup
 
@@ -243,12 +245,37 @@ if [[ "$(detect_os --kernel)" == "Linux" ]] && [[ "$(detect_os --arch)" == "x86_
 else
     if [[ "$(detect_os --kernel)" == "Linux" ]] && \
         [[ ("$(detect_os --arch)" == "aarch") ]] || [[ "$(detect_os --arch)" == "arm*" ]];then
-        (LD_LIBRARY_PATH=./arm/bin/lib:$LD_LIBRARY_PATH ./arm/bin/bin/ss-local -c ./US2.cong &>log/ss.log) &
-        printf "%s\n" "message log to log/ss.log"
-    else
-        printf "%s\n" "setup shadowsocks failed"
-    fi
+            if [ -f  /system/bin/linker64 ];then
+                printf "%s\n%s\n" "Platform: Android aarch64/armv8" "Start shadowsocks for Android"
+                if [ -f ./android/shadowsocks-libev_android/arm64-v8a/libss-local.so ];then
+                    if (./android/shadowsocks-libev_android/arm64-v8a/libss-local.so -c ./US2.conf &>log/ss.log &);then
+                        printf "%s\n" "Shadowsocks android start successful"
+                    else
+                        printf "%s\n" "Shadowsocks for android aarch64/armv8 start failed"
+                    fi
+                else
+                    printf "%s\n" "Shadowsocks for android submodule is missing,check the libss-local.so if it in ./android/shadowsocks-libev_android/arm64-v8a/ dir"
+                fi
+            elif [ -f /system/bin/linker ];then
+                printf "%s\n%s\n" "Platform: Android aarch64/armv8" "Start shadowsocks for Android"
+                if [ -f ./android/shadowsocks-libev_android/armeabi-v7a/libss-local.so ];then
+                    if (./android/shadowsocks-libev_android/armeabi-v7a/libss-local.so -c ./US2.conf &>log/ss_android_armv7a.log &);then
+                        printf "%s\n" "Shadowsocks android start successful"
+                        printf "%s\n" "message log to log/ss_android_armv7a.log"
+                    else
+                        printf "%s\n" "Shadowsocks for android armv7a start failed"
+                    fi
+                else
+                    printf "%s\n" "Shadowsocks for android submodule is missing,check the libss-local.so if it in ./android/shadowsocks-libev_android/arm64-v8a/ dir"
+                fi
 
+            else
+                # TODO : ARM GLIBC BOARD support
+                # Normal arm board base glibc is not support yet,but soon it come 
+            fi
+    fi
+else
+    printf "%s\n" "UNSUPPORT SYSTEM, support x86_64 and android platform yet,but other will come  soon"
 fi
 }
 
@@ -267,7 +294,6 @@ fi
 # TODO: Linux Standard Base PDA Specification 3.0RC1--System Initialization
 # See:http://refspecs.linuxbase.org/LSB_3.0.0/LSB-PDA/LSB-PDA/iniscrptfunc.html
 # implement some function to start ,stop,restart daemon
-
 
 
 if ( "$DIR/x86_64/client_linux_amd64" -c "$DIR/configs/kcp.conf" );then
