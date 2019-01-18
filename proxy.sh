@@ -183,6 +183,7 @@ else
         else
             # do something
             # do nothing ,compiled as static binary
+            :
         fi
 
     else
@@ -209,6 +210,7 @@ fi
 
 function get_shadowsocks(){
     # TODO: get_shadowsocks function
+    :
 }
 
 function setup_proxy(){
@@ -272,10 +274,17 @@ else
             else
                 # TODO : ARM GLIBC BOARD support
                 # Normal arm board base glibc is not support yet,but soon it come 
+                :
             fi
-    fi
-else
-    printf "%s\n" "UNSUPPORT SYSTEM, support x86_64 and android platform yet,but other will come  soon"
+        elif [];then
+            :
+            # CYGWIN
+        elif [];then
+            :
+            # MACOS
+        else
+            printf "%s\n" "unsupport system"
+        fi
 fi
 }
 
