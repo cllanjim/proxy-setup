@@ -232,6 +232,7 @@ EOF
 }
 
 ___setup_shadowsocks_wgJui9NzMMzLM8pbFMnlIaSSUHbsbLVY(){
+bool=false
 # X86_64 Setup shadowsocks
 if [[ "$(detect_os --kernel)" == "Linux" ]] && [[ "$(detect_os --arch)" == "x86_64" ]];then
     if [ -f x86_64/shadowsocks-libev_glibc_x86-64/bin/ss-local ]; then
@@ -246,11 +247,11 @@ if [[ "$(detect_os --kernel)" == "Linux" ]] && [[ "$(detect_os --arch)" == "x86_
     fi
 else
     if [[ "$(detect_os --kernel)" == "Linux" ]] && \
-        [[ ("$(detect_os --arch)" == "aarch") ]] || [[ "$(detect_os --arch)" == "arm*" ]];then
+        [[ ("$(detect_os --arch)" == "aarch64") ]] || [[ "$(detect_os --arch)" == "arm*" ]];then
             if [ -f  /system/bin/linker64 ];then
                 printf "%s\n%s\n" "Platform: Android aarch64/armv8" "Start shadowsocks for Android"
                 if [ -f ./android/shadowsocks-libev_android/arm64-v8a/libss-local.so ];then
-                    if (./android/shadowsocks-libev_android/arm64-v8a/libss-local.so -c ./US2.conf &>log/ss.log &);then
+                    if ((./android/shadowsocks-libev_android/arm64-v8a/libss-local.so -c ./US2.conf &>log/ss.log )&);then
                         printf "%s\n" "Shadowsocks android start successful"
                     else
                         printf "%s\n" "Shadowsocks for android aarch64/armv8 start failed"
@@ -276,10 +277,10 @@ else
                 # Normal arm board base glibc is not support yet,but soon it come 
                 :
             fi
-        elif [];then
+        elif [ "$bool" = true ];then
             :
             # CYGWIN
-        elif [];then
+        elif [ "$bool" = true ];then
             :
             # MACOS
         else
