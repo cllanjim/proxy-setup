@@ -236,11 +236,13 @@ bool=false
 # X86_64 Setup shadowsocks
 if [[ "$(detect_os --kernel)" == "Linux" ]] && [[ "$(detect_os --arch)" == "x86_64" ]];then
     if [ -f x86_64/shadowsocks-libev_glibc_x86-64/bin/ss-local ]; then
-        if (LD_LIBRARY_PATH=x86_64/shadowsocks-libev_glibc_x86-64/lib:$LD_LIBRARY_PATH ./x86_64/shadowsocks-libev_glibc_x86-64/bin/ss-local -c ./US2.conf &>log/ss.log &);then
             printf "%s\n" "Staring shadowsocks"
             printf "%s\n" "message log to log/ss.log"
+        if (LD_LIBRARY_PATH=x86_64/shadowsocks-libev_glibc_x86-64/lib:$LD_LIBRARY_PATH ./x86_64/shadowsocks-libev_glibc_x86-64/bin/ss-local -c ./US2.conf &>log/ss.log &);then
+            printf "%s\n" "Start ss successful"
         else
             printf "%s\n" "Start shadowsocks failed"
+            printf "%s\n" "message log to log/ss.log"
         fi
     else
         printf "%s" "can not found shadowsocks"
@@ -262,11 +264,12 @@ else
             elif [ -f /system/bin/linker ];then
                 printf "%s\n%s\n" "Platform: Android aarch64/armv8" "Start shadowsocks for Android"
                 if [ -f ./android/shadowsocks-libev_android/armeabi-v7a/libss-local.so ];then
-                    if (./android/shadowsocks-libev_android/armeabi-v7a/libss-local.so -c ./US2.conf &>log/ss_android_armv7a.log &);then
+                    if (./android/shadowsocks-libev_android/armeabi-v7a/libss-local.so -c ./US2.conf &>log/ss_android_armv7a.log );then
                         printf "%s\n" "Shadowsocks android start successful"
                         printf "%s\n" "message log to log/ss_android_armv7a.log"
                     else
                         printf "%s\n" "Shadowsocks for android armv7a start failed"
+                        printf "%s\n" "message log to log/ss_android_armv7a.log"
                     fi
                 else
                     printf "%s\n" "Shadowsocks for android submodule is missing,check the libss-local.so if it in ./android/shadowsocks-libev_android/arm64-v8a/ dir"
@@ -290,27 +293,32 @@ fi
 }
 
 ___setup_kcptun_ZNIXZqrwykvJ3kahmYQMfFRoehKCgM2O(){
-if [ "$(detect_os --kernel)" == "Linux" ] && [ "$(detect_os --arch)" == "x86_64" ] && [ ! -f "$DIR/x86_64/client_linux_amd64" ];then
-    if [ ! -f "/tmp/client_linux_amd64" ]; then
+if [[ "$(detect_os --kernel)" == "Linux" ]] && [[ "$(detect_os --arch)" == "x86_64" ]];then
+    printf "%s\n" "Platform x86_64 Linux"
+    if [ ! -f "./x86_64/kcptun-linux-amd64-20181114/client_linux_amd64" ]; then
         printf "%s" "can not find kcptun client, please run \`get_kcptun\` again!"
-        return 3;
     else
-        cp "/tmp/client_linux_amd64" ""${DIR}"/x86_64"
+        printf "%s" "Start kcptun client"
+        (./x86_64/kcptun-linux-amd64-20181114/client_linux_amd64 -c kcptun.conf &>log/kcp.log &)
+    fi
+elif [[ "$(detect_os --kernel)" == "Linux" ]] && [[ "$(detect_os --arch)" == "aarch64" ]] || [[ "$(detect_os --arch)" == "aarch64" ]];then
+    printf "%s\n" "Platform  Android&&ARM Linux"
+    if [ ! -f "./arm/kcptun-linux-arm-20181114/client_linux_arm7" ]; then
+        printf "%s" "can not find kcptun client, please run \`get_kcptun\` again!"
+    else
+        printf "%s" "Start kcptun client"
+        (./arm/kcptun-linux-arm-20181114/client_linux_arm7 -c kcptun.conf &>log/kcp.log &)
     fi
 else
-    printf "%s\n" "find client_linux_amd64"
+    printf "%s\n" "setup kcptun:unsupport system"
 fi
+
+
+
 
 # TODO: Linux Standard Base PDA Specification 3.0RC1--System Initialization
 # See:http://refspecs.linuxbase.org/LSB_3.0.0/LSB-PDA/LSB-PDA/iniscrptfunc.html
 # implement some function to start ,stop,restart daemon
-
-
-if ( "$DIR/x86_64/client_linux_amd64" -c "$DIR/configs/kcp.conf" );then
-    echo Successful start kcp client
-else
-    echo "Start kcp client fail,Please try again"
-fi
 
 }
 
@@ -322,6 +330,8 @@ if [ ! -z "$@" ];then
         shift
         case "$param" in
             "--setup-ss") set -- "$@" "-ss"&&___setup_shadowsocks_wgJui9NzMMzLM8pbFMnlIaSSUHbsbLVY;;
+            "--setup-kcp") set -- "$@" "-kcp"&&___setup_kcptun_ZNIXZqrwykvJ3kahmYQMfFRoehKCgM2O;;
+            *)          set -- "$@" "'unknow options'"&&printf  "unrecognized option\n";;
         esac
     done
 
