@@ -223,7 +223,6 @@ cat <<EOF
 
 --setup-ss :   setup shadowsocks proxy
 --setup-kcp:   setup kcptun proxy
---setup-privoxy setup http proxy
 --kill-all:    kill ss and kcptun client
 Look at the source to view more functions:
 Github:https://github.com/ihexon/proxy-setup
@@ -304,17 +303,14 @@ if [[ "$(detect_os --kernel)" == "Linux" ]] && [[ "$(detect_os --arch)" == "x86_
 elif [[ "$(detect_os --kernel)" == "Linux" ]] && [[ "$(detect_os --arch)" == "aarch64" ]] || [[ "$(detect_os --arch)" == "aarch64" ]];then
     printf "%s\n" "Platform  Android&&ARM Linux"
     if [ ! -f "./arm/kcptun-linux-arm-20181114/client_linux_arm7" ]; then
-        printf "%s" "can not find kcptun client, please run \`get_kcptun\` again!"
+        printf "%s\n" "can not find kcptun client, please run \`get_kcptun\` again!"
     else
-        printf "%s" "Start kcptun client"
+        printf "%s\n" "Start kcptun client"
         (./arm/kcptun-linux-arm-20181114/client_linux_arm7 -c kcptun.conf &>log/kcp.log &)
     fi
 else
     printf "%s\n" "setup kcptun:unsupport system"
 fi
-
-
-
 
 # TODO: Linux Standard Base PDA Specification 3.0RC1--System Initialization
 # See:http://refspecs.linuxbase.org/LSB_3.0.0/LSB-PDA/LSB-PDA/iniscrptfunc.html
@@ -337,10 +333,6 @@ if [ ! -z "$@" ];then
 
 fi
 
-
-
-
-
 #if [ -f $DIR/x86_64/privoxy  ] && [ -f $DIR/x86_64/etc/privoxy/config  ] ; then
 #    printf "exec %s" "$DIR/bin/privoxy -c $DIR/etc/privoxy/config"
 #else
@@ -348,4 +340,17 @@ fi
 #fi
 
 }
+setup_all(){
+    kill_all &> /dev/null
+    setup_proxy --setup-kcp
+    setup_proxy --setup-ss
+}
+
+kill_all(){
+    killall ss-local
+    killall client_linux_amd64
+    killall client_linux_am
+}
+
+
 setup_help
