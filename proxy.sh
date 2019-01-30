@@ -33,6 +33,7 @@ cat <<EOF
 --help      get help
 --all       get all system info # not implement yet
 --kernel    get kernel name
+--pmgr      get package manager
 --host      get host name # not implement
 --version   get kernel version  # not implement yet
 --arch      get machine type # not implement yet
@@ -57,6 +58,17 @@ __print_arch(){
     printf "%s" "${platform_arch}"
 }
 
+# detect package manager in OS
+__package_mamager_QGnukilUyRnTQvIPGLmbSIYAVZLDI4w9(){
+for i in "apt" "yum" "pacman"
+    do
+        if [ -n "${$(which $i)#*found}" ];then
+            echo "$i"
+        fi
+        
+    done
+}
+
 if [ ! -z "$@" ]; then
     for param in "$@"; do
         shift
@@ -64,6 +76,7 @@ if [ ! -z "$@" ]; then
          "--help")   set -- "$@" "-h"&&help_detect_os;;
          "--kernel") set -- "$@" "-k"&&print_kernel;;
          "--arch")   set -- "$@" "-arch"&&__print_arch;;
+         "--pmgr")   set -- "$@" "-pmgr"&&__package_mamager_QGnukilUyRnTQvIPGLmbSIYAVZLDI4w9;;
          *)          set -- "$@" "'unknow options'"&&printf  "unrecognized option\n";;
         esac
     done
@@ -212,6 +225,18 @@ function get_shadowsocks(){
     # TODO: get_shadowsocks function
     :
 }
+function get_privoxy(){
+
+    if [[ -n "$res" ]];then
+
+    fi
+
+
+
+
+
+
+}
 
 function setup_proxy(){
 
@@ -340,13 +365,15 @@ fi
 #fi
 
 }
-setup_all(){
+
+function setup_all(){
     kill_all &> /dev/null
     setup_proxy --setup-kcp
     setup_proxy --setup-ss
 }
 
-kill_all(){
+
+function kill_all(){
     killall ss-local
     killall client_linux_amd64
     killall client_linux_am
