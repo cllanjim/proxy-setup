@@ -1,32 +1,20 @@
 # proxy-setup 
-Auto deploy a proxy(HTTP and Socks5) proxy
+Auto deploy a proxy(Socks5) proxy
 
-
-**STATUS: NOT FINISH  YET**
 
 # Delpoy using script
-
-
 
 Source the script:
 `source ./proxy.sh`
 
-once the function add into your enviroment,you can using the function install launch the kcp,shadowsocks,and privoxy 
-eaily, see the help message of script.
+`setup_all`
 
+kill service
+`kill_all`
 
-# Deploy
-Install privoxy.
-`apt install privoxy`
-Download kcptun client and shadowsocks
-```
-cp privoxy_config  /etc/privoxy/config
-sudo systemctl start privoxy.service
-ss-local ./ss.conf &
-./client_linux_amd64 -c kcp.conf &
-```
-available proxy location at:
+once the function add into your enviroment,you can using the function install launch the kcp,shadowsocks,see the help message of script.
+
+Proxy addr:
 ```
 socks5://127.0.0.1:1080
-http://127.0.0.1:2018
 ```
