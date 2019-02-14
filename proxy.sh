@@ -7,6 +7,35 @@
 # Using this way to lunch all things togeter
 # setup_proxy get_kcptun get_shadowsocks  kcptun_client shadowsocks_client privoxy
 
+
+function ascii_art(){
+    cat << EOF
+    $$\       $$\                                                                                                 
+$$ |      \__|                                                                                                
+$$$$$$$\  $$\  $$$$$$\  $$$$$$\$$$$\   $$$$$$\  $$$$$$$\   $$$$$$\  $$\   $$\         $$$$$$$\  $$\  $$\  $$\ 
+$$  __$$\ $$ |$$  __$$\ $$  _$$  _$$\ $$  __$$\ $$  __$$\ $$  __$$\ $$ |  $$ |$$$$$$\ $$  __$$\ $$ | $$ | $$ |
+$$ |  $$ |$$ |$$ /  $$ |$$ / $$ / $$ |$$ /  $$ |$$ |  $$ |$$$$$$$$ |$$ |  $$ |\______|$$ |  $$ |$$ | $$ | $$ |
+$$ |  $$ |$$ |$$ |  $$ |$$ | $$ | $$ |$$ |  $$ |$$ |  $$ |$$   ____|$$ |  $$ |        $$ |  $$ |$$ | $$ | $$ |
+$$$$$$$  |$$ |\$$$$$$$ |$$ | $$ | $$ |\$$$$$$  |$$ |  $$ |\$$$$$$$\ \$$$$$$$ |        $$ |  $$ |\$$$$$\$$$$  |
+\_______/ \__| \____$$ |\__| \__| \__| \______/ \__|  \__| \_______| \____$$ |        \__|  \__| \_____\____/ 
+              $$\   $$ |                                            $$\   $$ |                                
+              \$$$$$$  |                                            \$$$$$$  |                                
+               \______/                                              \______/                                 
+
+#-> Proxy setup : Auto deploy proxy easily
+#-> Author: ZhuZhiHao <zzheasy@gmail.com> <https://github.com/ihexon/proxy-setup>
+#->
+#-> History:
+#->   2-15-2019 : support android(aarch64) and Linux(Linux_x86-64 glibc)
+
+
+---
+
+Please support me,thanks!
+
+EOF
+}
+
 function setup_help(){
 cat <<EOF
 
