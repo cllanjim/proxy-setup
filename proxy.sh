@@ -68,6 +68,33 @@ for i in "apt" "yum" "pacman"
 
     done
 }
+__platform_9WsLZqH4t3ZRcYqEQ2uLZiP610fs2dhf(){
+    unset PLT_UNKNOW
+    if test "$(detect_os --kernel)" = "Linux" -a "$(detect_os --arch)" = "x86_64"; then
+        PLT="$(printf "%s" "Linux-x86_64")"
+    elif test $(detect_os --kernel) = "Linux" -a $(detect_os --arch) = "aarch64" -o $(detect_os --arch) = "armv8l" && test -f  "/system/bin/linker"; then
+        PLT="$(printf "%s" "Android-x64")"
+    elif test $(detect_os --kernel) = "Linux" -a $(detect_os --arch) = "aarch64" -o $(detect_os --arch) = "armv8l"; then
+        PLT="$(printf "%s" "Linux-armv8")"
+    elif test $(detect_os --kernel) = "Linux" -a $(detect_os --arch) = armv7l; then
+        PLT="$(printf "%s" "Linux-armv7l")"
+    else
+        PLT_UNKNOW="1"
+        PLT="$(printf "%s" "Linux-unknow")"
+        MSG="$(printf "%s" "Do not support this architecture yet")"
+    fi
+
+    if [[ "$PLT_UNKNOW" != "1" ]]; then
+        MSG="$(printf "%s" "Staring proxy-setup...")"
+        printf "\n\n\nPlatform: \e[32m%s\n%s\n\e[0m\n\n\n" "$PLT" "$MSG"
+    else
+        MSG="$(printf "%s" "Error, not support this architecture.")"
+        printf "\n\n\nPlatform: \e[31m%s\n%s\n\e[0m\n\n\n" "$PLT" "$MSG"
+
+    fi
+    unset PLT_UNKNOW
+
+}
 
 if [ ! -z "$@" ]; then
     for param in "$@"; do
@@ -77,11 +104,13 @@ if [ ! -z "$@" ]; then
          "--kernel") set -- "$@" "-k"&&print_kernel;;
          "--arch")   set -- "$@" "-arch"&&__print_arch;;
          "--pmgr")   set -- "$@" "-pmgr"&&__package_mamager_QGnukilUyRnTQvIPGLmbSIYAVZLDI4w9;;
+         "--plt")    set -- "$@" "plt"&&__platform_9WsLZqH4t3ZRcYqEQ2uLZiP610fs2dhf;;
          *)          set -- "$@" "'unknow options'"&&printf  "unrecognized option\n";;
         esac
     done
 fi
 }
+
 function get_kcptun(){
 detect_downloader(){
     if [ -f /usr/bin/curl ];then
