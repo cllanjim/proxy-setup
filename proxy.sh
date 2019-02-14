@@ -65,7 +65,7 @@ for i in "apt" "yum" "pacman"
         if [ -n "${$(which $i)#*found}" ];then
             echo "$i"
         fi
-        
+
     done
 }
 
@@ -114,11 +114,11 @@ fi
 declare -i using_local_kcp=1 # if using internet to download package or using local package
 
 if [ "${using_local_kcp}" -eq 0 ];then
-    # x86_64 architecture logic 
+    # x86_64 architecture logic
     if [[ "$(detect_os --kernel)" == "Linux" ]] && [[ "$(detect_os --arch)" == "x86_64" ]]; then
         declare -r download_url="https://github.com/xtaci/kcptun/releases/download/v20181114/kcptun-linux-amd64-20181114.tar.gz"
         if ( $(detect_downloader) -L "${download_url}" -o "/tmp/kcptun-linux-amd64-20181114.tar.gz" );then
-             printf "%s\n%s\n"   "kcptun archive file store at /tmp/kcptun-linux-amd64-20181114.tar.gz" \ 
+             printf "%s\n%s\n"   "kcptun archive file store at /tmp/kcptun-linux-amd64-20181114.tar.gz" \
                             "Extract /tmp/kcptun-linux-amd64-20181114.tar.gz into /tmp"
             if (tar -xvf /tmp/kcptun-linux-amd64-20181114.tar.gz -C /tmp);then
                 printf "%s\n" "extract kcptun-linux-amd64-20181114.tar.gz successful"
@@ -134,7 +134,7 @@ if [ "${using_local_kcp}" -eq 0 ];then
     elif [[ "$(detect_os --kernel)" == ""Linux ]] && [[ "$(detect_os --arch)" == "armv8l" ]]; then
         declare -r download_url="https://github.com/xtaci/kcptun/releases/download/v20181114/kcptun-linux-arm-20181114.tar.gz"
         if  ($(detect_downloader) -L "${download_url}" -o "/tmp/kcptun-linux-arm-20181114.tar.gz");then
-             printf "%s\n%s\n"   "kcptun archive file store at /tmp/kcptun-linux-arm-20181114.tar.gz" \ 
+             printf "%s\n%s\n"   "kcptun archive file store at /tmp/kcptun-linux-arm-20181114.tar.gz" \
                             "Extract /tmp/kcptun-linux-arm-20181114.tar.gz into /tmp"
             if (tar -xvf /tmp/kcptun-linux-arm-20181114.tar.gz -C /tmp);then
                 printf "%s\n" "extract kcptun-linux-arm-20181114.tar.gz successful"
@@ -147,7 +147,7 @@ if [ "${using_local_kcp}" -eq 0 ];then
             return
         fi
 
-    
+
     # I dont have MacOs.If I have chance test on MacOS,I will finish this pices of code
     ####################################################################################
     elif [[ "$(detect_os --kernel)" == "Drawin" ]]; then
@@ -190,7 +190,7 @@ else
             fi
         fi
 
-        
+
         if [[ -d /data/local/tmp ]];then
             printf "%s\n" "ARM Architecture,platform is Android"
         else
@@ -228,10 +228,10 @@ function get_shadowsocks(){
 
 function setup_proxy(){
 
-declare -r DIR="$(cd "$(dirname "$0")" && pwd)"
+#declare -r DIR="$(cd "$(dirname "$0")" && pwd)"
 
 ___setup_proxyhelp_GDiRd1VBggVJhYR7qt9gJlCU0URyy6vO(){
-    
+
 cat <<EOF
 
 --setup-ss :   setup shadowsocks proxy
@@ -261,10 +261,11 @@ if [[ "$(detect_os --kernel)" == "Linux" ]] && [[ "$(detect_os --arch)" == "x86_
     fi
 else
     if [[ "$(detect_os --kernel)" == "Linux" ]] && \
-        [[ ("$(detect_os --arch)" == "aarch64") ]] || [[ "$(detect_os --arch)" == "arm*" ]];then
+        [[ ("$(detect_os --arch)" == "aarch64") ]] || [[ "$(detect_os --arch)" == "armv8l" ]];then
             if [ -f  /system/bin/linker64 ];then
                 printf "%s\n%s\n" "Platform: Android aarch64/armv8" "Start shadowsocks for Android"
                 if [ -f ./android/shadowsocks-libev_android/arm64-v8a/libss-local.so ];then
+                    chmod +x ./android/shadowsocks-libev_android/arm64-v8a/libss-local.so
                     if ((./android/shadowsocks-libev_android/arm64-v8a/libss-local.so -c ./US2.conf &>log/ss.log )&);then
                         printf "%s\n" "Shadowsocks android start successful"
                     else
@@ -289,7 +290,7 @@ else
 
             else
                 # TODO : ARM GLIBC BOARD support
-                # Normal arm board base glibc is not support yet,but soon it come 
+                # Normal arm board base glibc is not support yet,but soon it come
                 :
             fi
         elif [ "$bool" = true ];then
@@ -314,7 +315,7 @@ if [[ "$(detect_os --kernel)" == "Linux" ]] && [[ "$(detect_os --arch)" == "x86_
         printf "%s\n" "message log to log/kcp.log"
         (./x86_64/kcptun-linux-amd64-20181114/client_linux_amd64 -c kcptun.conf &>log/kcp.log &)
     fi
-elif [[ "$(detect_os --kernel)" == "Linux" ]] && [[ "$(detect_os --arch)" == "aarch64" ]] || [[ "$(detect_os --arch)" == "aarch64" ]];then
+elif [[ "$(detect_os --kernel)" == "Linux" ]] && [[ "$(detect_os --arch)" == "aarch64" ]] || [[ "$(detect_os --arch)" == "armv8l" ]];then
     printf "%s\n" "Platform  Android&&ARM Linux"
     if [ ! -f "./arm/kcptun-linux-arm-20181114/client_linux_arm7" ]; then
         printf "%s\n" "can not find kcptun client, please run \`get_kcptun\` again!"
@@ -337,8 +338,15 @@ ___setup_privoxy_4AuVJlCndZMXrtlmyq7EYSCGTcJXWqabproxy(){
         mkdir /tmp/proxy-setup
         cp -rf ./x86_64/privoxy /tmp/proxy-setup
         (LD_LIBRARY_PATH=./x86_64/privoxy/libs ./x86_64/privoxy/sbin/privoxy --no-daemon /tmp/proxy-setup/privoxy/etc/config &> log/privoxy.log &)
+    elif [[ "$(detect_os --kernel)" == "Linux" ]] &&  [[ "$(detect_os --arch)" == "aarch64" ]] || [[ "$(detect_os --arch)" == "armv8l" ]]; then
+        #printf "%s\n" "Android"
+        DIR=$(pwd)
+        cp -rf ./arm/privoxy-aarch64 /data/local/tmp/privoxy
+        $(cd /data/local/tmp/privoxy/etc && ../lib/libloader.so.1 ../sbin/privoxy --no-daemon ./config &> $DIR/log/privoxy.log) &
+        printf "%s" "privoxy start"
+
     else
-        printf "%s\n" "skip setup privoxy in unsupport system"
+        echo privoxy start failed
 
     fi
 }
@@ -369,14 +377,12 @@ function setup_all(){
     kill_all &> /dev/null
     setup_proxy --setup-kcp
     setup_proxy --setup-ss
-    if [[ "$(detect_os --kernel)" == "Linux" ]] && [[ "$(detect_os --arch)" == "x86_64" ]]; then
     setup_proxy --setup-privoxy
-    fi
 }
 
 
 function kill_all(){
-    
+
     if [[ "$(detect_os --kernel)" == "Linux" ]] && [[ "$(detect_os --arch)" == "x86_64" ]]; then
     chmod +x ./x86_64/common_bins/killall
     ./x86_64/common_bins/killall ss-local\
@@ -386,7 +392,9 @@ function kill_all(){
    else
        (killall   libss-local.so \
    client_linux_am \
-   client_linux_arm7 )
+   ./arm/kcptun-linux-arm-20181114/client_linux_arm7 \
+   client_linux_arm7 \
+   libloader.so.1 )
    fi
 }
 
